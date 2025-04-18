@@ -15,6 +15,9 @@ namespace BinaryTreeCollection
       Parent = null;
     }
 
-    public override string ToString() => Value?.ToString() ?? "null";
+    public override string ToString()
+    {
+      return Value?.ToString() ?? "null";
+    }
   }
 }
