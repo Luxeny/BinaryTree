@@ -4,67 +4,49 @@ using System.Collections.Generic;
 
 namespace BinaryTreeCollection
 {
-  public class ForwardEnumerator<T> : IEnumerator<T> where T : IComparable<T>
-  {
-    private BinaryTreeNode<T> current;
-    private readonly BinaryTreeNode<T> root;
-    private Stack<BinaryTreeNode<T>> stack;
-    private bool enumerationStarted;
-
-    public ForwardEnumerator(BinaryTreeNode<T> root)
+    public class ForwardEnumerator<T> : IEnumerator<T> where T : IComparable<T>
     {
-      this.root = root;
-      this.stack = new Stack<BinaryTreeNode<T>>();
-      Reset();
-    }
+        private readonly BinaryTreeNode<T> _root;
+        private Stack<BinaryTreeNode<T>> _stack;
+        private bool _started;
 
-    public bool MoveNext()
-    {
-      if (root == null) return false;
-
-      if (!enumerationStarted)
-      {
-        enumerationStarted = true;
-        current = root;
-        while (current.Left != null)
+        public ForwardEnumerator(BinaryTreeNode<T> root)
         {
-          stack.Push(current);
-          current = current.Left;
+            _root = root;
+            _stack = new Stack<BinaryTreeNode<T>>();
+            Reset();
         }
-        return true;
-      }
 
-      if (current.Right != null)
-      {
-        current = current.Right;
-        while (current.Left != null)
+        public bool MoveNext()
         {
-          stack.Push(current);
-          current = current.Left;
+            if (_root == null) return false;
+
+            if (!_started)
+            {
+                _started = true;
+                _stack.Push(_root);
+                return true;
+            }
+
+            if (_stack.Count == 0) return false;
+
+            var current = _stack.Pop();
+
+            if (current.Right != null) _stack.Push(current.Right);
+            if (current.Left != null) _stack.Push(current.Left);
+
+            return _stack.Count > 0;
         }
-        return true;
-      }
 
-      if (stack.Count > 0)
-      {
-        current = stack.Pop();
-        return true;
-      }
+        public T Current => _stack.Count > 0 ? _stack.Peek().Value : default;
+        object IEnumerator.Current => Current;
 
-      current = null;
-      return false;
+        public void Reset()
+        {
+            _stack.Clear();
+            _started = false;
+        }
+
+        public void Dispose() { }
     }
-
-    public void Reset()
-    {
-      current = null;
-      stack.Clear();
-      enumerationStarted = false;
-    }
-
-    public T Current => current.Value;
-    object IEnumerator.Current => Current;
-
-    public void Dispose() { }
-  }
 }
