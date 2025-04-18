@@ -20,39 +20,41 @@ namespace BinaryTreeCollection
 
     public bool MoveNext()
     {
-      if (root == null) return false;
-
-      if (!enumerationStarted)
-      {
-        enumerationStarted = true;
-        current = root;
-        while (current.Right != null)
+        if (root == null)
         {
-          stack.Push(current);
-          current = current.Right;
+            return false;
         }
-        return true;
-      }
-
-      if (current.Left != null)
-      {
-        current = current.Left;
-        while (current.Right != null)
+    
+        if (!enumerationStarted)
         {
-          stack.Push(current);
-          current = current.Right;
+            enumerationStarted = true;
+            current = root;
+            while (current.Left != null)
+            {
+                stack.Push(current);
+                current = current.Left;
+            }
+            return true;
         }
-        return true;
-      }
-
-      if (stack.Count > 0)
-      {
-        current = stack.Pop();
-        return true;
-      }
-
-      current = null;
-      return false;
+    
+        if (current.Right != null)
+        {
+            current = current.Right;
+            while (current.Left != null)
+            {
+                stack.Push(current);
+                current = current.Left;
+            }
+            return true;
+        }
+    
+        if (stack.Count > 0)
+        {
+            current = stack.Pop();
+            return true;
+        }
+        current = null;
+        return false;
     }
 
     public void Reset()
