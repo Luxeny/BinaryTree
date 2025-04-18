@@ -4,72 +4,67 @@ using System.Collections.Generic;
 
 namespace BinaryTreeCollection
 {
-  public class InOrderEnumerator<T> : IEnumerator<T> where T : IComparable<T>
-  {
-    private readonly BinaryTreeNode<T> root;
-    private BinaryTreeNode<T> current;
-    private Stack<BinaryTreeNode<T>> nodeStack;
-    private bool enumerationStarted;
-
-    public InOrderEnumerator(BinaryTreeNode<T> root)
+    public class InOrderEnumerator<T> : IEnumerator<T> where T : IComparable<T>
     {
-      this.root = root;
-      nodeStack = new Stack<BinaryTreeNode<T>>();
-      Reset();
-    }
+        private readonly BinaryTreeNode<T> _root;
+        private BinaryTreeNode<T> _current;
+        private Stack<BinaryTreeNode<T>> _stack;
+        private bool _started;
 
-    public bool MoveNext()
-    {
-      if (root == null) return false;
-
-      if (!enumerationStarted)
-      {
-        enumerationStarted = true;
-        current = root;
-        while (current != null && current.Left != null)
+        public InOrderEnumerator(BinaryTreeNode<T> root)
         {
-          nodeStack.Push(current);
-          current = current.Left;
+            _root = root;
+            _stack = new Stack<BinaryTreeNode<T>>();
+            Reset();
         }
-        return current != null;
-      }
 
-      if (current == null) return false;
-
-      if (current.Right != null)
-      {
-        current = current.Right;
-        while (current.Left != null)
+        public bool MoveNext()
         {
-          nodeStack.Push(current);
-          current = current.Left;
+            if (_root == null) return false;
+
+            if (!_started)
+            {
+                _started = true;
+                _current = _root;
+                while (_current.Left != null)
+                {
+                    _stack.Push(_current);
+                    _current = _current.Left;
+                }
+                return true;
+            }
+
+            if (_current.Right != null)
+            {
+                _current = _current.Right;
+                while (_current.Left != null)
+                {
+                    _stack.Push(_current);
+                    _current = _current.Left;
+                }
+                return true;
+            }
+
+            if (_stack.Count > 0)
+            {
+                _current = _stack.Pop();
+                return true;
+            }
+
+            _current = null;
+            return false;
         }
-        return true;
-      }
 
-      if (nodeStack.Count > 0)
-      {
-        current = nodeStack.Pop();
-        return true;
-      }
+        public void Reset()
+        {
+            _current = null;
+            _stack.Clear();
+            _started = false;
+        }
 
-      current = null;
-      return false;
+        public T Current => _current != null ? _current.Value : default;
+        object IEnumerator.Current => Current;
+
+        public void Dispose() { }
     }
-
-    public void Reset()
-    {
-      current = null;
-      nodeStack.Clear();
-      enumerationStarted = false;
-    }
-
-    public T Current => current != null ? current.Value : default(T);
-    object IEnumerator.Current => Current;
-
-    public void Dispose()
-    {
-      // Nothing to dispose
-    }
-  }
 }
